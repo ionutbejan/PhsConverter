@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">PhsConverter</string>
+    <string name="permission_needed">We need you to accept some permissions before using PhsConverter. Click here to accept application permissions.</string>
+    <string name="no_media_found">We couldn\'t find any media on this device. Tap on the button below to start recording</string>
+    <string name="list_item_prefix">Recorded: %1s</string>
+    <string name="add_text_hint">Add your text here</string>
+    <string name="reset">Reset</string>
+    <string name="done">Done</string>
+    <string name="start">Start</string>
+    <string name="next">Next word</string>
+    <string name="convert">Convert to Phs</string>
+    <string name="current_word">Current Word:\n%1$s</string>
+</resources>
