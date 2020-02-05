@@ -1,39 +1,31 @@
 package com.example.phsconverter.converter;
 
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatTextView;
-import androidx.core.app.NotificationCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.phsconverter.R;
 import com.example.phsconverter.converter.textslider.RotateUpPageTransformation;
 import com.example.phsconverter.converter.textslider.TextSlideViewPager;
-import com.example.phsconverter.converter.textslider.ZoomOutPageTransformer;
-import com.example.phsconverter.utils.Constants;
-import com.example.phsconverter.utils.FileUtils;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.example.phsconverter.converter.ConvertPresenter.SPLIT_CHARACTER;
 import static com.example.phsconverter.utils.Constants.FILE_KEY;
 
-public class ConvertActivity extends AppCompatActivity {
-    private final static String SPACE_REGEX = "\\s+";
+public class ConvertActivity extends AppCompatActivity implements ConvertView {
     @BindView(R.id.tv_reset)
     AppCompatTextView tvDelete;
     @BindView(R.id.et_text)
@@ -46,12 +38,11 @@ public class ConvertActivity extends AppCompatActivity {
     AppCompatTextView tvAction;
     @BindView(R.id.vp_lyrics)
     ViewPager2 vpTextData;
-    private boolean started = false;
-    private boolean finished = false;
-    private ArrayList<Data> dataToConvert;
-    private String[] textData;
-    private int currentWordPosition = 0;
+
     private CustomWaveformFragment convertFragment;
+    private ConvertPresenter presenter;
+    private String startPosition;
+    private String endPosition;
 
     public static void launch(Context context, File file) {
         Intent intent = new Intent(context, ConvertActivity.class);
@@ -64,6 +55,7 @@ public class ConvertActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.convert_activity);
         ButterKnife.bind(this);
+        presenter = new ConvertPresenter(this);
         if (getIntent() != null) {
             convertFragment = CustomWaveformFragment.launch(((File) getIntent().getSerializableExtra(FILE_KEY)).getPath());
             getSupportFragmentManager().beginTransaction()
@@ -83,105 +75,83 @@ public class ConvertActivity extends AppCompatActivity {
     @OnClick(R.id.tv_reset)
     public void onDeleteInputText() {
         if (etText.getText() != null && !etText.getText().toString().isEmpty()) {
-            reset(true);
+            presenter.reset(true);
         }
     }
 
-    private void reset(boolean delete) {
-        started = false;
-        finished = false;
-        textData = null;
-        dataToConvert = new ArrayList<>();
-        tvAction.setText(getString(R.string.start));
-        currentWordPosition = 0;
+    @OnClick(R.id.tv_action)
+    public void onAction() {
+        presenter.onAction(etText);
+    }
+
+    @OnClick(R.id.tv_convert)
+    public void onConvert() {
+        presenter.onConvert();
+    }
+
+    @Override
+    public void showProgress() {
+        // TODO: 2/5/2020 show a loading progress
+    }
+
+    @Override
+    public void hideProgress() {
+        // TODO: 2/5/2020 hide loading progress
+    }
+
+    @Override
+    public Context getContext() {
+        return this;
+    }
+
+    @Override
+    public void updateOnReset(boolean delete) {
         convertFragment.resetMarkers();
         tvCurrentWord.setText("");
         vpTextData.setVisibility(View.GONE);
         if (delete)
             etText.setText("");
-
+        tvAction.setText(getString(R.string.start));
         etText.setVisibility(View.VISIBLE);
     }
 
-    @OnClick(R.id.tv_action)
-    public void onAction() {
-        if (finished) {
-            for (Data data : dataToConvert)
-                Log.i(ConvertActivity.class.getSimpleName(), data.toString() + "");
-            return;
-        }
-
-        if (!started) {
-            if (etText.getText() != null && !etText.getText().toString().isEmpty()) {
-                started = true;
-                tvAction.setText(getString(R.string.next));
-                textData = etText.getText().toString().split(SPACE_REGEX);
-                dataToConvert = new ArrayList<>();
-                vpTextData.setAdapter(new TextSlideViewPager(this, textData));
-                vpTextData.setCurrentItem(0, true);
-                etText.setVisibility(View.INVISIBLE);
-                vpTextData.setVisibility(View.VISIBLE);
-            } else {
-                Snackbar.make(tvAction, "No text data available", Snackbar.LENGTH_SHORT).show();
-                reset(false);
-            }
-        } else {
-            highlight(currentWordPosition);
-        }
+    @Override
+    public void showMessage(String message) {
+        Snackbar.make(tvAction, message, Snackbar.LENGTH_SHORT).show();
     }
 
-    private void highlight(int wordPosition) {
-        if (wordPosition <= textData.length - 1) {
-            String startPosition = convertFragment.getStartMakerPos();
-            String endPosition = convertFragment.getEndMarkerPos();
-            if (!convertFragment.updateMarkers()) {
-                Snackbar.make(tvAction, "Markers offset error", Snackbar.LENGTH_SHORT).show();
-                return;
-            }
-            dataToConvert.add(new Data(textData[wordPosition], startPosition, endPosition));
-            Log.i(Constants.TAG, "Added " + textData[wordPosition] + " from position " + currentWordPosition);
-
-            currentWordPosition++;
-            vpTextData.setCurrentItem(currentWordPosition, true);
-            if (currentWordPosition == textData.length) {
-                onWordsFinished();
-            }
-        } else {
-            onWordsFinished();
-        }
+    @Override
+    public void updateAfterStart(String[] data) {
+        vpTextData.setAdapter(new TextSlideViewPager(this, data));
+        vpTextData.setCurrentItem(0, true);
+        tvAction.setText(getString(R.string.next));
+        vpTextData.setVisibility(View.VISIBLE);
     }
 
-    private void onWordsFinished() {
+    @Override
+    public boolean canUpdateFragmentUI() {
+        this.startPosition = convertFragment.getStartMakerPos();
+        this.endPosition = convertFragment.getEndMarkerPos();
+        if (!convertFragment.updateMarkers()) {
+            showMessage("Markers offset error");
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public String getHeadsPositions() {
+        return startPosition + SPLIT_CHARACTER + endPosition;
+    }
+
+    @Override
+    public void updatePager(int position) {
+        vpTextData.setCurrentItem(position, true);
+    }
+
+    @Override
+    public void onWordsFinished() {
         tvAction.setText(getString(R.string.done));
-        finished = true;
-    }
-
-    @OnClick(R.id.tv_convert)
-    public void onConvert() {
-        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "notification_channel_id");
-        builder.setContentTitle("File Upload")
-                .setContentText("Upload in progress")
-                .setSmallIcon(android.R.drawable.stat_sys_download);
-        if (manager != null) {
-            new Thread(() -> {
-                String data = Objects.requireNonNull(etText.getText()).toString();
-                FileUtils.writeToFile(data, this, false);
-                for (int increment = 0; increment < 100; increment++) {
-                    builder.setProgress(100, increment, false);
-                    manager.notify(1, builder.build());
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        Log.i(Constants.TAG, e.getMessage());
-                    }
-                }
-
-                builder.setContentText("Upload Completed")
-                        .setProgress(0, 0, false);
-
-                manager.notify(1, builder.build());
-            }).start();
-        }
     }
 }
