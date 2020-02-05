@@ -5,14 +5,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.app.NotificationCompat;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.phsconverter.R;
+import com.example.phsconverter.converter.textslider.RotateUpPageTransformation;
+import com.example.phsconverter.converter.textslider.TextSlideViewPager;
+import com.example.phsconverter.converter.textslider.ZoomOutPageTransformer;
 import com.example.phsconverter.utils.Constants;
 import com.example.phsconverter.utils.FileUtils;
 import com.google.android.material.snackbar.Snackbar;
@@ -39,6 +44,8 @@ public class ConvertActivity extends AppCompatActivity {
     AppCompatTextView tvConvert;
     @BindView(R.id.tv_action)
     AppCompatTextView tvAction;
+    @BindView(R.id.vp_lyrics)
+    ViewPager2 vpTextData;
     private boolean started = false;
     private boolean finished = false;
     private ArrayList<Data> dataToConvert;
@@ -63,6 +70,14 @@ public class ConvertActivity extends AppCompatActivity {
                     .add(R.id.container, convertFragment)
                     .commit();
         }
+
+        setupViewPager();
+    }
+
+    private void setupViewPager() {
+        vpTextData.setUserInputEnabled(false);
+        vpTextData.setOrientation(ViewPager2.ORIENTATION_VERTICAL);
+        vpTextData.setPageTransformer(new RotateUpPageTransformation());
     }
 
     @OnClick(R.id.tv_reset)
@@ -81,8 +96,11 @@ public class ConvertActivity extends AppCompatActivity {
         currentWordPosition = 0;
         convertFragment.resetMarkers();
         tvCurrentWord.setText("");
+        vpTextData.setVisibility(View.GONE);
         if (delete)
             etText.setText("");
+
+        etText.setVisibility(View.VISIBLE);
     }
 
     @OnClick(R.id.tv_action)
@@ -99,7 +117,10 @@ public class ConvertActivity extends AppCompatActivity {
                 tvAction.setText(getString(R.string.next));
                 textData = etText.getText().toString().split(SPACE_REGEX);
                 dataToConvert = new ArrayList<>();
-                highlightWord(textData[0]);
+                vpTextData.setAdapter(new TextSlideViewPager(this, textData));
+                vpTextData.setCurrentItem(0, true);
+                etText.setVisibility(View.INVISIBLE);
+                vpTextData.setVisibility(View.VISIBLE);
             } else {
                 Snackbar.make(tvAction, "No text data available", Snackbar.LENGTH_SHORT).show();
                 reset(false);
@@ -110,7 +131,6 @@ public class ConvertActivity extends AppCompatActivity {
     }
 
     private void highlight(int wordPosition) {
-        highlightWord(textData[wordPosition]);
         if (wordPosition <= textData.length - 1) {
             String startPosition = convertFragment.getStartMakerPos();
             String endPosition = convertFragment.getEndMarkerPos();
@@ -122,6 +142,7 @@ public class ConvertActivity extends AppCompatActivity {
             Log.i(Constants.TAG, "Added " + textData[wordPosition] + " from position " + currentWordPosition);
 
             currentWordPosition++;
+            vpTextData.setCurrentItem(currentWordPosition, true);
             if (currentWordPosition == textData.length) {
                 onWordsFinished();
             }
@@ -162,9 +183,5 @@ public class ConvertActivity extends AppCompatActivity {
                 manager.notify(1, builder.build());
             }).start();
         }
-    }
-
-    private void highlightWord(String word) {
-        tvCurrentWord.setText(getString(R.string.current_word, word));
     }
 }

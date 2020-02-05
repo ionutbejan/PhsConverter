@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/recyclerview_background">
+    android:background="@drawable/recyclerview_background"
+    app:layout_constraintVertical_weight="1">
 
     <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/et_text"
@@ -11,24 +12,35 @@
         android:layout_height="0dp"
         android:background="@color/transparent"
         android:hint="@string/add_text_hint"
-        android:padding="10dp"
+        android:padding="18dp"
         android:textColor="@color/white"
         android:textColorHint="@color/color3"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@id/container"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/tv_reset"
+        app:layout_constraintVertical_chainStyle="spread"
+        app:layout_constraintVertical_weight="0.3" />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/vp_lyrics"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/container"
+        app:layout_constraintTop_toBottomOf="@id/tv_reset"
+        app:layout_constraintVertical_chainStyle="spread" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_reset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
+        android:padding="@dimen/spacing_small"
         android:text="@string/reset"
         android:textColor="@color/color3"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@id/container"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/et_text" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_current_word"
@@ -49,12 +61,12 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
+        android:padding="@dimen/spacing_small"
         android:text="@string/start"
         android:textColor="@color/color3"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@id/container"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/et_text" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_convert"
@@ -72,12 +84,13 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <FrameLayout
-        android:background="@color/transparent"
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/bubble_size"
+        android:background="@color/transparent"
         app:layout_constraintBottom_toTopOf="@id/tv_convert"
-        app:layout_constraintTop_toBottomOf="@id/et_text" />
+        app:layout_constraintTop_toBottomOf="@id/et_text"
+        app:layout_constraintVertical_chainStyle="spread"
+        app:layout_constraintVertical_weight="0.7" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
