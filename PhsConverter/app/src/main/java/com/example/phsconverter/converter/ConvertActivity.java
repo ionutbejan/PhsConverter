@@ -14,6 +14,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.example.phsconverter.R;
 import com.example.phsconverter.converter.textslider.RotateUpPageTransformation;
 import com.example.phsconverter.converter.textslider.TextSlideViewPager;
+import com.example.phsconverter.converter.wavefragment.CustomWaveformFragment;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;

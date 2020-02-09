@@ -39,7 +39,6 @@ dependencies {
 
     // audio file ui fragment
     implementation 'com.github.Semantive:waveform-android:v1.2'
-
     implementation 'commons-net:commons-net:3.6'
 
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'

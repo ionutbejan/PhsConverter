@@ -1,4 +1,4 @@
-package com.example.phsconverter.converter;
+package com.example.phsconverter.converter.wavefragment;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -20,7 +20,7 @@ import static com.example.phsconverter.utils.Constants.FILE_KEY;
 public class CustomWaveformFragment extends WaveformFragment {
     private String filePath;
 
-    static CustomWaveformFragment launch(String filePath) {
+    public static CustomWaveformFragment launch(String filePath) {
         CustomWaveformFragment fragment = new CustomWaveformFragment();
         Bundle bundle = new Bundle();
         bundle.putString(FILE_KEY, filePath);
@@ -67,7 +67,7 @@ public class CustomWaveformFragment extends WaveformFragment {
         }
     }
 
-    boolean updateMarkers() {
+    public boolean updateMarkers() {
         int aux = this.mEndPos - this.mStartPos;
         if (aux <= 0)
             return false;
@@ -77,17 +77,17 @@ public class CustomWaveformFragment extends WaveformFragment {
         return true;
     }
 
-    void resetMarkers() {
+    public void resetMarkers() {
         this.mStartPos = 0;
         this.mEndPos = this.mMaxPos;
         this.updateDisplay();
     }
 
-    String getEndMarkerPos() {
+    public String getEndMarkerPos() {
         return String.valueOf(mWaveformView.pixelsToMillisecs(this.mEndPos));
     }
 
-    String getStartMakerPos() {
+    public String getStartMakerPos() {
         return String.valueOf(mWaveformView.pixelsToMillisecs(this.mStartPos));
     }
 }

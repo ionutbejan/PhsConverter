@@ -1,6 +1,5 @@
 package com.example.phsconverter.converter;
 
-import android.content.Context;
 import android.util.Log;
 import android.view.View;
 
@@ -12,9 +11,8 @@ import static com.example.phsconverter.utils.Constants.TAG;
 
 class ConvertPresenter {
     private final static String SPACE_REGEX = "\\s+";
-    public final static String SPLIT_CHARACTER = ":";
+    final static String SPLIT_CHARACTER = ":";
     private ConvertView view;
-    private Context context;
     private boolean started = false;
     private boolean finished = false;
     private ArrayList<Data> dataToConvert;
@@ -23,7 +21,6 @@ class ConvertPresenter {
 
     ConvertPresenter(ConvertView view) {
         this.view = view;
-        this.context = view.getContext();
     }
 
     void onAction(AppCompatEditText etText) {
