@@ -2,6 +2,8 @@ package com.example.phsconverter.converter;
 
 import android.content.Context;
 
+import java.io.File;
+
 public interface ConvertView {
     void showProgress();
 
@@ -22,4 +24,6 @@ public interface ConvertView {
     void updatePager(int position);
 
     void onWordsFinished();
+
+    File getCurrentPlayingFile();
 }

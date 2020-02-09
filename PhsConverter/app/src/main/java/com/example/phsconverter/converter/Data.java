@@ -40,6 +40,6 @@ public class Data {
     @NonNull
     @Override
     public String toString() {
-        return text + "\n" + startStamp + "\n" + endStamp;
+        return startStamp + "   " + endStamp + "   " + text + "\n";
     }
 }

@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import static android.Manifest.permission.READ_PHONE_STATE;
 import static android.Manifest.permission.RECORD_AUDIO;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static com.example.phsconverter.main.MainActivity.RequestPermissionCode;
@@ -41,7 +42,7 @@ class MainPresenter {
 
     void onRecording() {
         if (checkPermission()) {
-            File pshDir = new File(FileUtils.geApplicationDataPath(activity));
+            File pshDir = new File(FileUtils.getApplicationDataPath(activity));
             boolean pshDirAvailable = true;
             if (!pshDir.exists()) {
                 pshDirAvailable = pshDir.mkdirs();
@@ -99,7 +100,7 @@ class MainPresenter {
 
     void loadMedia() {
         if (checkPermission())
-            view.onMediaLoaded(from(new File(FileUtils.geApplicationDataPath(activity))));
+            view.onMediaLoaded(from(new File(FileUtils.getApplicationDataPath(activity))));
         else
             view.onPermissionDenied();
     }
@@ -128,16 +129,19 @@ class MainPresenter {
 
     void requestPermission() {
         ActivityCompat.requestPermissions(activity, new
-                String[]{WRITE_EXTERNAL_STORAGE, RECORD_AUDIO}, RequestPermissionCode);
+                String[]{WRITE_EXTERNAL_STORAGE, RECORD_AUDIO, READ_PHONE_STATE}, RequestPermissionCode);
     }
 
     boolean checkPermission() {
-        int result = ContextCompat.checkSelfPermission(activity,
+        int storage = ContextCompat.checkSelfPermission(activity,
                 WRITE_EXTERNAL_STORAGE);
-        int result1 = ContextCompat.checkSelfPermission(activity,
+        int record = ContextCompat.checkSelfPermission(activity,
                 RECORD_AUDIO);
-        return result == PackageManager.PERMISSION_GRANTED &&
-                result1 == PackageManager.PERMISSION_GRANTED;
+        int phone = ContextCompat.checkSelfPermission(activity,
+                READ_PHONE_STATE);
+        return storage == PackageManager.PERMISSION_GRANTED &&
+                record == PackageManager.PERMISSION_GRANTED &&
+                phone == PackageManager.PERMISSION_DENIED;
     }
 
     private void prepareMediaRecorder() {

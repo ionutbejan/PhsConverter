@@ -5,9 +5,12 @@ import android.view.View;
 
 import androidx.appcompat.widget.AppCompatEditText;
 
-import java.util.ArrayList;
+import com.example.phsconverter.utils.FileUtils;
+import com.example.phsconverter.utils.TextUtils;
 
-import static com.example.phsconverter.utils.Constants.TAG;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Calendar;
 
 class ConvertPresenter {
     private final static String SPACE_REGEX = "\\s+";
@@ -18,6 +21,7 @@ class ConvertPresenter {
     private ArrayList<Data> dataToConvert;
     private String[] textData;
     private int currentWordPosition = 0;
+    private String initialTextData;
 
     ConvertPresenter(ConvertView view) {
         this.view = view;
@@ -31,6 +35,7 @@ class ConvertPresenter {
         if (!started) {
             if (etText.getText() != null && !etText.getText().toString().isEmpty()) {
                 started = true;
+                initialTextData = etText.getText().toString();
                 etText.setVisibility(View.INVISIBLE);
                 textData = etText.getText().toString().split(SPACE_REGEX);
                 dataToConvert = new ArrayList<>();
@@ -74,6 +79,17 @@ class ConvertPresenter {
     }
 
     void onConvert() {
-        Log.i(TAG, dataToConvert + "");
+        long conversionTime = Calendar.getInstance().getTimeInMillis();
+        String[] files = new String[3];
+        files[0] = FileUtils.writeToFile(initialTextData, view.getContext(), FileUtils.LAB_EXTENSION, conversionTime);
+        files[1] = FileUtils.writeToFile(TextUtils.toPlainText(dataToConvert), view.getContext(), FileUtils.PHS_EXTENSION, conversionTime);
+        files[2] = view.getCurrentPlayingFile().getPath();
+
+        if (FileUtils.zip(view.getContext(), files, conversionTime)) {
+            File labFile = new File(files[0]);
+            File phsFile = new File(files[1]);
+            labFile.delete();
+            phsFile.delete();
+        }
     }
 }

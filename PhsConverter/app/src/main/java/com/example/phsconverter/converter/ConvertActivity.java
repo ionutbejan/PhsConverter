@@ -44,6 +44,7 @@ public class ConvertActivity extends AppCompatActivity implements ConvertView {
     private ConvertPresenter presenter;
     private String startPosition;
     private String endPosition;
+    private File currentPlayingFile;
 
     public static void launch(Context context, File file) {
         Intent intent = new Intent(context, ConvertActivity.class);
@@ -58,7 +59,8 @@ public class ConvertActivity extends AppCompatActivity implements ConvertView {
         ButterKnife.bind(this);
         presenter = new ConvertPresenter(this);
         if (getIntent() != null) {
-            convertFragment = CustomWaveformFragment.launch(((File) getIntent().getSerializableExtra(FILE_KEY)).getPath());
+            currentPlayingFile = ((File) getIntent().getSerializableExtra(FILE_KEY));
+            convertFragment = CustomWaveformFragment.launch(currentPlayingFile.getPath());
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, convertFragment)
                     .commit();
@@ -154,5 +156,10 @@ public class ConvertActivity extends AppCompatActivity implements ConvertView {
     @Override
     public void onWordsFinished() {
         tvAction.setText(getString(R.string.done));
+    }
+
+    @Override
+    public File getCurrentPlayingFile() {
+        return currentPlayingFile;
     }
 }

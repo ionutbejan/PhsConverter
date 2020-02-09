@@ -46,12 +46,14 @@ public class MainActivity extends AppCompatActivity implements MainView {
                                            @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == RequestPermissionCode) {
             if (grantResults.length > 0) {
-                boolean StoragePermission = grantResults[0] ==
+                boolean storagePermission = grantResults[0] ==
                         PackageManager.PERMISSION_GRANTED;
-                boolean RecordPermission = grantResults[1] ==
+                boolean recordPermission = grantResults[1] ==
+                        PackageManager.PERMISSION_GRANTED;
+                boolean phoneStatePermission = grantResults[2] ==
                         PackageManager.PERMISSION_GRANTED;
 
-                if (StoragePermission && RecordPermission) {
+                if (storagePermission && recordPermission && phoneStatePermission) {
                     tvPermissions.setVisibility(View.GONE);
                     btnRecord.setVisibility(View.VISIBLE);
                     btnRecord.setEnabled(true);
