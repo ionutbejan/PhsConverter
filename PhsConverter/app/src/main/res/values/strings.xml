@@ -10,4 +10,6 @@
     <string name="next">Next word</string>
     <string name="convert">Convert to Phs</string>
     <string name="current_word">Current Word:\n%1$s</string>
+    <string name="no_converted_files">You don\'t have any converted files yet.</string>
+    <string name="converted_files_title">Your converted files</string>
 </resources>

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.phsconverter.R;
 import com.example.phsconverter.converter.ConvertActivity;
+import com.example.phsconverter.main.converted.ConvertedListFragment;
 import com.example.phsconverter.main.media.Media;
 import com.example.phsconverter.main.media.MediaAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -37,9 +38,13 @@ public class MainActivity extends AppCompatActivity implements MainView {
     TextView tvPermissions;
     @BindView(R.id.tv_no_media)
     TextView tvNoMedia;
+    @BindView(R.id.btnSwitch)
+    FloatingActionButton btnSwitch;
+
     private MainPresenter presenter;
     private MediaAdapter adapter;
     private int playingPosition = -1;
+    private boolean showingFragment;
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -57,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
                     tvPermissions.setVisibility(View.GONE);
                     btnRecord.setVisibility(View.VISIBLE);
                     btnRecord.setEnabled(true);
+                    btnSwitch.setEnabled(true);
                     rvPlaylist.setVisibility(View.VISIBLE);
                     presenter.loadMedia();
                 } else {
@@ -65,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
                     btnRecord.setVisibility(View.INVISIBLE);
                     rvPlaylist.setVisibility(View.INVISIBLE);
                     btnRecord.setEnabled(false);
+                    btnSwitch.setEnabled(false);
                 }
             }
         }
@@ -199,6 +206,26 @@ public class MainActivity extends AppCompatActivity implements MainView {
         }
         presenter.setRecording(!presenter.isRecording());
         btnRecord.setImageResource(presenter.isRecording() ? R.drawable.ic_recording : R.drawable.ic_record);
+    }
+
+    @OnClick(R.id.btnSwitch)
+    public void onSwitchFragment() {
+        if (showingFragment) {
+            getSupportFragmentManager().popBackStack();
+            showingFragment = false;
+            return;
+        }
+        showingFragment = true;
+        getSupportFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(
+                        R.animator.card_flip_right_in,
+                        R.animator.card_flip_right_out,
+                        R.animator.card_flip_left_in,
+                        R.animator.card_flip_left_out)
+                .replace(R.id.fragment_container, new ConvertedListFragment())
+                .addToBackStack(null)
+                .commit();
     }
 
     @OnClick(R.id.tv_permission)

@@ -19,6 +19,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -79,11 +81,11 @@ public class FileUtils {
         }
 
 
-        return fileName + getFormatedDate(time);
+        return fileName + "_" + getFormatedDate(time);
     }
 
     private static String getFormatedDate(long time) {
-        DateFormat dateFormat = new SimpleDateFormat("_yyyy_MM_dd_HH_mm", Locale.getDefault());
+        DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm", Locale.getDefault());
         return dateFormat.format(time);
     }
 
@@ -114,6 +116,20 @@ public class FileUtils {
             e.printStackTrace();
             return false;
         }
+    }
 
+    public static ArrayList<File> getConvertedFiles(Context context) {
+        ArrayList<File> inFiles = new ArrayList<>();
+        File phsDir = new File(getConvertedDirPath(context));
+        if (phsDir.exists()) {
+            File[] files = phsDir.listFiles();
+            for (File file : files) {
+                if (file.getName().endsWith(".zip")) {
+                    inFiles.add(file);
+                }
+            }
+        }
+        Collections.reverse(inFiles);
+        return inFiles;
     }
 }
