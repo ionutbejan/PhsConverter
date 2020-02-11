@@ -60,7 +60,7 @@ class MainPresenter {
                     view.message(e.getMessage(), false);
                 }
             } else {
-                view.message("Could not access *.psh files", false);
+                view.message("Could not access *.phs files", false);
             }
         } else {
             requestPermission();

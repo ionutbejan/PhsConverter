@@ -29,7 +29,7 @@ import static android.Manifest.permission.READ_PHONE_STATE;
 
 public class FileUtils {
     private final static String CONVERTED = "Converted";
-    public final static String PHS_EXTENSION = ".psh";
+    public final static String PHS_EXTENSION = ".phs";
     public final static String LAB_EXTENSION = ".lab";
     private final static String ZIP_EXTENSION = ".zip";
     private static final int BUFFER = 1024;
@@ -68,7 +68,9 @@ public class FileUtils {
     private static String generateFileName(Context context, long time) {
         int phone = ContextCompat.checkSelfPermission(context,
                 READ_PHONE_STATE);
+
         String fileName = "";
+
         if (phone == PackageManager.PERMISSION_GRANTED) {
             TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             if (telephonyManager != null)
@@ -80,17 +82,16 @@ public class FileUtils {
             fileName = "unidentified";
         }
 
-
-        return fileName + "_" + getFormatedDate(time);
+        return fileName + "_" + getFormattedDate(time);
     }
 
-    private static String getFormatedDate(long time) {
+    private static String getFormattedDate(long time) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm", Locale.getDefault());
         return dateFormat.format(time);
     }
 
     public static boolean zip(Context context, String[] files, long time) {
-        File zipFile = new File(getConvertedDirPath(context), getFormatedDate(time) + ZIP_EXTENSION);
+        File zipFile = new File(getConvertedDirPath(context), getFormattedDate(time) + ZIP_EXTENSION);
         try (FileOutputStream dest = new FileOutputStream(zipFile)) {
             BufferedInputStream origin;
             try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest))) {
