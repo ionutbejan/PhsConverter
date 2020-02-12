@@ -1,6 +1,5 @@
 package com.example.phsconverter.networking;
 
-import android.content.Context;
 import android.util.Log;
 
 import org.apache.commons.net.ftp.FTP;
@@ -16,31 +15,29 @@ import static com.example.phsconverter.utils.Constants.PORT;
 import static com.example.phsconverter.utils.Constants.TAG;
 import static com.example.phsconverter.utils.Constants.USERNAME;
 
-public class MyFTPClient {
+public class FTPManager {
     private static FTPClient mFTPClient = null;
 
-    public static boolean ftpConnect() {
+    static boolean ftpConnect() {
         try {
             mFTPClient = new FTPClient();
-            // connecting to the host
             mFTPClient.connect(HOST, PORT);
-
-            // now check the reply code, if positive mean connection success
             if (FTPReply.isPositiveCompletion(mFTPClient.getReplyCode())) {
                 boolean status = mFTPClient.login(USERNAME, PASSWORD);
                 mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
-                mFTPClient.enterLocalPassiveMode();
+                mFTPClient.enterLocalActiveMode();
                 Log.i(TAG, status + " ");
                 return status;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             Log.d(TAG, "Error: could not connect to host " + HOST + "\n" + e);
         }
 
         return false;
     }
 
-    public static boolean ftpDisconnect() {
+    static boolean ftpDisconnect() {
         try {
             mFTPClient.logout();
             mFTPClient.disconnect();
@@ -108,19 +105,15 @@ public class MyFTPClient {
         return false;
     }
 
-    public boolean ftpUpload(String srcFilePath, String desFileName,
-                             String desDirectory, Context context) {
+    public boolean ftpUpload(String srcFilePath, String desFileName) {
         boolean status = false;
-        try {
-            FileInputStream srcFileStream = new FileInputStream(srcFilePath);
+        try (FileInputStream srcFileStream = new FileInputStream(srcFilePath)) {
             status = mFTPClient.storeFile(desFileName, srcFileStream);
-            srcFileStream.close();
             return status;
         } catch (Exception e) {
             e.printStackTrace();
             Log.d(TAG, "upload failed: " + e);
         }
-
         return status;
     }
 }

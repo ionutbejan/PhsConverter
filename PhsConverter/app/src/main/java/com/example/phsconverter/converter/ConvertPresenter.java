@@ -1,6 +1,5 @@
 package com.example.phsconverter.converter;
 
-import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.widget.AppCompatEditText;
@@ -14,6 +13,7 @@ import java.util.Calendar;
 
 class ConvertPresenter {
     private final static String SPACE_REGEX = "\\s+";
+    private final static String SPECIAL_CHARACTERS_REGEX = "[^\\p{L}\\p{Z}]";
     final static String SPLIT_CHARACTER = ":";
     private ConvertView view;
     private boolean started = false;
@@ -37,7 +37,8 @@ class ConvertPresenter {
                 started = true;
                 initialTextData = etText.getText().toString();
                 etText.setVisibility(View.INVISIBLE);
-                textData = etText.getText().toString().split(SPACE_REGEX);
+                String data = etText.getText().toString();
+                textData = data.replaceAll(SPECIAL_CHARACTERS_REGEX, " ").split(SPACE_REGEX);
                 dataToConvert = new ArrayList<>();
                 view.updateAfterStart(textData);
             } else {
@@ -79,17 +80,24 @@ class ConvertPresenter {
     }
 
     void onConvert() {
-        long conversionTime = Calendar.getInstance().getTimeInMillis();
-        String[] files = new String[3];
-        files[0] = FileUtils.writeToFile(initialTextData, view.getContext(), FileUtils.LAB_EXTENSION, conversionTime);
-        files[1] = FileUtils.writeToFile(TextUtils.toPlainText(dataToConvert), view.getContext(), FileUtils.PHS_EXTENSION, conversionTime);
-        files[2] = view.getCurrentPlayingFile().getPath();
+        if (finished) {
+            view.showProgress();
+            long conversionTime = Calendar.getInstance().getTimeInMillis();
+            String[] files = new String[3];
+            files[0] = FileUtils.writeToFile(initialTextData, view.getContext(), FileUtils.LAB_EXTENSION, conversionTime);
+            files[1] = FileUtils.writeToFile(TextUtils.toPlainText(dataToConvert), view.getContext(), FileUtils.PHS_EXTENSION, conversionTime);
+            files[2] = view.getCurrentPlayingFile().getPath();
 
-        if (FileUtils.zip(view.getContext(), files, conversionTime)) {
-            File labFile = new File(files[0]);
-            File phsFile = new File(files[1]);
-            labFile.delete();
-            phsFile.delete();
+            if (FileUtils.zip(view.getContext(), files, conversionTime)) {
+                File labFile = new File(files[0]);
+                File phsFile = new File(files[1]);
+                labFile.delete();
+                phsFile.delete();
+            }
+
+            view.hideProgress();
+        } else {
+            view.showMessage("You cannot convert at this time.");
         }
     }
 }

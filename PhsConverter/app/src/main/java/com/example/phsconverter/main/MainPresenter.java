@@ -141,7 +141,7 @@ class MainPresenter {
                 READ_PHONE_STATE);
         return storage == PackageManager.PERMISSION_GRANTED &&
                 record == PackageManager.PERMISSION_GRANTED &&
-                phone == PackageManager.PERMISSION_DENIED;
+                phone == PackageManager.PERMISSION_GRANTED;
     }
 
     private void prepareMediaRecorder() {

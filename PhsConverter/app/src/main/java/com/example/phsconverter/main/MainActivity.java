@@ -185,6 +185,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
         btnRecord.setVisibility(View.INVISIBLE);
         rvPlaylist.setVisibility(View.INVISIBLE);
         btnRecord.setEnabled(false);
+        btnSwitch.setVisibility(View.INVISIBLE);
+        btnSwitch.setEnabled(false);
     }
 
     @Override
