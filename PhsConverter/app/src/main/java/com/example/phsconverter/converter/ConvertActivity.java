@@ -1,8 +1,10 @@
 package com.example.phsconverter.converter;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -45,6 +47,7 @@ public class ConvertActivity extends AppCompatActivity implements ConvertView {
     private String startPosition;
     private String endPosition;
     private File currentPlayingFile;
+    private ProgressDialog progressDialog;
 
     public static void launch(Context context, File file) {
         Intent intent = new Intent(context, ConvertActivity.class);
@@ -65,7 +68,8 @@ public class ConvertActivity extends AppCompatActivity implements ConvertView {
                     .add(R.id.container, convertFragment)
                     .commit();
         }
-
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Converting files...");
         setupViewPager();
     }
 
@@ -94,12 +98,12 @@ public class ConvertActivity extends AppCompatActivity implements ConvertView {
 
     @Override
     public void showProgress() {
-        // TODO: 2/5/2020 show a loading progress
+        progressDialog.show();
     }
 
     @Override
     public void hideProgress() {
-        // TODO: 2/5/2020 hide loading progress
+        new Handler().postDelayed(() -> progressDialog.dismiss(), 1000);
     }
 
     @Override

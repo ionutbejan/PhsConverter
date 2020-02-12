@@ -15,6 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.phsconverter.R;
 import com.example.phsconverter.utils.FileUtils;
 
+import java.io.File;
+import java.util.ArrayList;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -38,6 +41,12 @@ public class ConvertedListFragment extends Fragment {
     private void setupRecycler() {
         rvZips.setLayoutManager(new GridLayoutManager(getContext(), 2, RecyclerView.VERTICAL, false));
         rvZips.setAdapter(zipsAdapter);
-        zipsAdapter.setFilesData(FileUtils.getConvertedFiles(getContext()));
+        ArrayList<File> zipData = FileUtils.getConvertedFiles(getContext());
+        if (zipData != null && !zipData.isEmpty()) {
+            tvNoZips.setVisibility(View.GONE);
+            zipsAdapter.setFilesData(zipData);
+        }  else {
+            tvNoZips.setVisibility(View.VISIBLE);
+        }
     }
 }

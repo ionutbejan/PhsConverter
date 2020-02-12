@@ -1,13 +1,18 @@
 package com.example.phsconverter.main;
 
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -40,6 +45,10 @@ public class MainActivity extends AppCompatActivity implements MainView {
     TextView tvNoMedia;
     @BindView(R.id.btnSwitch)
     FloatingActionButton btnSwitch;
+    @BindView(R.id.iv_recording)
+    AppCompatImageView ivRecording;
+    @BindView(R.id.recording_layout)
+    FrameLayout flRecording;
 
     private MainPresenter presenter;
     private MediaAdapter adapter;
@@ -94,6 +103,19 @@ public class MainActivity extends AppCompatActivity implements MainView {
         btnRecord.setEnabled(permission);
         rvPlaylist.setVisibility(permission ? View.VISIBLE : View.INVISIBLE);
         setupRecycler();
+        setupRecordingAnimation();
+    }
+
+    private void setupRecordingAnimation() {
+        ObjectAnimator scaleDown = ObjectAnimator.ofPropertyValuesHolder(
+                ivRecording,
+                PropertyValuesHolder.ofFloat("scaleX", 1.3f),
+                PropertyValuesHolder.ofFloat("scaleY", 1.3f));
+        scaleDown.setDuration(660);
+        scaleDown.setInterpolator(new FastOutSlowInInterpolator());
+        scaleDown.setRepeatCount(ObjectAnimator.INFINITE);
+        scaleDown.setRepeatMode(ObjectAnimator.REVERSE);
+        scaleDown.start();
     }
 
     private void setupRecycler() {
@@ -148,6 +170,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void onRecording() {
+        flRecording.setVisibility(View.VISIBLE);
+        btnSwitch.setEnabled(false);
         showSnack("Recording Started");
     }
 
@@ -158,6 +182,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void onStopRecording(String newRecordPath) {
+        flRecording.setVisibility(View.GONE);
+        btnSwitch.setEnabled(true);
         if (adapter.getItemCount() == 0) {
             tvNoMedia.setVisibility(View.GONE);
             rvPlaylist.setVisibility(View.VISIBLE);
