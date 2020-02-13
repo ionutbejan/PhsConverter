@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
                 if (storagePermission && recordPermission && phoneStatePermission) {
                     tvPermissions.setVisibility(View.GONE);
                     btnRecord.setVisibility(View.VISIBLE);
+                    btnSwitch.setVisibility(View.VISIBLE);
                     btnRecord.setEnabled(true);
                     btnSwitch.setEnabled(true);
                     rvPlaylist.setVisibility(View.VISIBLE);
